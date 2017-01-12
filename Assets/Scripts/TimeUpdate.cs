@@ -4,23 +4,22 @@ using UnityEngine.UI;
 
 public class TimeUpdate : MonoBehaviour {
 
-	private Text GUI;
+	private Text completionTimeText;
 	private string guiText;
-	private float time;
+	private float currentTime;
+	private GameObject Scriptholder;
 		
 	// Use this for initialization
 	void Start () {
 
-		//time = Time.time;
-		GUI = gameObject.GetComponent<Text>();
-		guiText = "Completion time: " + Time.time;
-		GUI.text = guiText;
+		//DontDestroyOnLoad(this);
 
-		//guiText.text = "Some Text Here";
-	}
+		completionTimeText = GameObject.Find("Completion").GetComponent<Text>();
+		Scriptholder = GameObject.Find("Scriptholder");
+		currentTime = Scriptholder.GetComponent<SceneManager>().GetTime();
+		//guiText = "Completion time: "+Time.time;
+		completionTimeText.text = "Completion time: "+currentTime.ToString();
 	
-	// Update is called once per frame
-	void Update () {
-	
 	}
+		
 }

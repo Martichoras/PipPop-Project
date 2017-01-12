@@ -8,7 +8,7 @@ public class PinController : MonoBehaviour {
 	private int localAngle;
 	//private Vector3 rot;
 
-	private GameObject sphere;
+	//private GameObject sphere;
 
 	// Use this for initialization
 	void Start () {

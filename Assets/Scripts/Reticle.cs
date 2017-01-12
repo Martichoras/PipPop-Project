@@ -4,8 +4,10 @@ using System.Collections;
 public class Reticle : MonoBehaviour {
 
 	//public Camera camera;
+	public float lerpDuration = 2.5f; // 2.5 seconds
 	private Vector3 initialScale;
 	public bool pinFound = false;
+	private Vector3 previousPos;
 
 	void Start () {
 		pinFound = false;
@@ -27,6 +29,7 @@ public class Reticle : MonoBehaviour {
 		transform.LookAt (Camera.main.transform.position); //rotate towards the camera
 		transform.Rotate(0.0f, 180.0f,0.0f); // Reticle is a quad, so it needs to be reversed so the 'normal' side is visible
 		transform.position = Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward * distance;
+		//transform.position = Vector3.Lerp(hit.point,Camera.main.transform.position + Camera.main.transform.rotation * Vector3.forward *distance, Time.deltaTime);
 		transform.localScale = initialScale * distance; // sets scale of quad by the original scale*dist. scaling is performed linarly with with distance
 
 		if(hit.rigidbody != null){
@@ -45,4 +48,14 @@ public class Reticle : MonoBehaviour {
 		}
 
 	}
+
+/*	IEnumerator LerpTransform(){
+		float t = 0.0f;
+		Vector3 startPos = transform.position;
+		while(t < 1.0f){
+			t += Time.deltaTime * (Time.timeScale/lerpDuration);
+		}
+
+		transform.position = Vector3.Lerp(startPos, target
+	}*/
 }
