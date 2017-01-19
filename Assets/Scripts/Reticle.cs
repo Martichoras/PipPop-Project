@@ -49,13 +49,4 @@ public class Reticle : MonoBehaviour {
 
 	}
 
-/*	IEnumerator LerpTransform(){
-		float t = 0.0f;
-		Vector3 startPos = transform.position;
-		while(t < 1.0f){
-			t += Time.deltaTime * (Time.timeScale/lerpDuration);
-		}
-
-		transform.position = Vector3.Lerp(startPos, target
-	}*/
 }

@@ -21,8 +21,10 @@ public class PinSpawner : MonoBehaviour {
 
 		// Use this for initialization
 		void Start () {
-
+		
+		pinAmount = (int)GameObject.Find("Scriptholder").GetComponent<SceneManager>().pinAmount;	
 			//limitReached = false;
+
 		sphereRadius = (gameObject.transform.localScale.x/2); // grabs dimensions of sphere / 2 = radius
 
 			do{

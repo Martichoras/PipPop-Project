@@ -22,6 +22,9 @@ public class PipPop_Controller : MonoBehaviour {
 	public Material material1;
 	public Material material2;
 
+	public float min = 0.3f;
+	public float max = 10.0f;
+
 	// Use this for initialization
 	void Start () {
 		//sceneManager = GameObject.Find("Scriptholder");
@@ -46,7 +49,8 @@ public class PipPop_Controller : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
-		
+		//blinkFrequency = blinkFrequency/DistanceBetweenPoints();
+		Debug.Log(DistanceBetweenPoints());
 	}
 
 	IEnumerator flasher(){
@@ -73,10 +77,10 @@ public class PipPop_Controller : MonoBehaviour {
 			while(true){
 				GetComponent<MeshRenderer>().material = material1;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(blinkFrequency*DistanceBetweenPoints()/4);
 				GetComponent<MeshRenderer>().material = material2;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(blinkFrequency*DistanceBetweenPoints()/4);
 			}
 			break;
 		
@@ -105,6 +109,14 @@ public class PipPop_Controller : MonoBehaviour {
 		spawnPoint.y = Mathf.Abs(spawnPoint.y); // another way of assuring no -y instantiations i.e. absolute value of y / opløfter fortegn
 
 		return spawnPoint;
+	}
+
+	float DistanceBetweenPoints(){
+		Vector3 x = GameObject.FindGameObjectWithTag("Tracker").GetComponent<Transform>().position;
+		Vector3 y = this.transform.position;
+
+		return Mathf.Clamp(Vector3.Distance(x,y),min,max);
+
 	}
 
 }
