@@ -10,9 +10,16 @@ public class SceneManager : MonoBehaviour {
 	//private GameObject SettingsPanel;
 	private bool isActive;
 	public float pinAmount;
+	public float blinkFrequency;
 	private Text pinAmountUpdate;
+	private Text freqAmountUpdate;
 	private Slider pinSlider;
+	private Slider freqSlider;
 	private CanvasGroup SettingsCanvasGroup;
+	private CanvasGroup ConditionCanvasGroup;
+
+	public bool useDistractors;
+	public bool isProximityDependent;
 
 
 	void Start(){
@@ -21,24 +28,40 @@ public class SceneManager : MonoBehaviour {
 
 		//Access Pinslider
 		if(Application.loadedLevelName == "1_Main"){
-		pinSlider = GameObject.Find("PinSlider").GetComponent<Slider>();
-		pinAmount = pinSlider.value;
-		pinAmountUpdate = GameObject.Find("PinAmountUpdate").GetComponent<Text>();
+			pinSlider = GameObject.Find("PinSlider").GetComponent<Slider>();
+			pinAmount = pinSlider.value;
+			pinAmountUpdate = GameObject.Find("PinAmountUpdate").GetComponent<Text>();
+
+			freqSlider = GameObject.Find("FreqSlider").GetComponent<Slider>();
+			blinkFrequency = freqSlider.value;
+			freqAmountUpdate = GameObject.Find("FreqAmountUpdate").GetComponent<Text>();
 		}
+
 		// Access and disable Settings canvas
 		SettingsCanvasGroup = GameObject.Find("SettingsCanvasGroup").GetComponent<CanvasGroup>();
 		//SettingsPanel = GameObject.Find("Settings Canvas").GetComponent<Canvas>();
 		SettingsCanvasGroup.alpha = 0;
 		SettingsCanvasGroup.blocksRaycasts = false;
-		pinAmount = pinAmount;
-		//GetTime();
+
+		ConditionCanvasGroup = GameObject.Find("ConditionCanvasGroup").GetComponent<CanvasGroup>();
+		//SettingsPanel = GameObject.Find("Settings Canvas").GetComponent<Canvas>();
+		//ConditionCanvasGroup.alpha = 0;
+		//ConditionCanvasGroup.blocksRaycasts = false;
+
+		//pinAmount = pinAmount;
+		//blinkFrequency = blinkFrequency;
+
 	}
 
 
 	void FixedUpdate(){
 		if(Application.loadedLevelName == "1_Main"){
-		pinAmount= pinSlider.value;
-		pinAmountUpdate.text = pinAmount.ToString();
+			pinAmount= pinSlider.value;
+			pinAmountUpdate.text = pinAmount.ToString();
+
+			blinkFrequency = freqSlider.value;
+			blinkFrequency = (float)System.Math.Round((double)blinkFrequency,2);
+			freqAmountUpdate.text = blinkFrequency.ToString();
 		}
 
 		currentTime += Time.deltaTime;
@@ -46,7 +69,11 @@ public class SceneManager : MonoBehaviour {
 		//GetTime();
 
 		if(Application.loadedLevelName == "1_Main"){
-			
+
+			// GET DISTRACTOR BOOL
+			useDistractors = GameObject.Find("DistractorToggle").GetComponent<Toggle>().isOn;
+			// USE PROXIMITY BOOL
+			isProximityDependent = GameObject.Find("ProximityToggle").GetComponent<Toggle>().isOn;
 			currentTime = 0.0f;
 		}
 
@@ -55,8 +82,7 @@ public class SceneManager : MonoBehaviour {
 			Application.Quit();
 		}
 
-		//Debug.Log(currentTime);
-		//Debug.Log(Time.time);
+
 	
 	}
 
@@ -86,19 +112,21 @@ public class SceneManager : MonoBehaviour {
 	}
 
 	public void Settings(){
-		//GameObject.Find("Settings Canvas").GetComponent<Canvas>().enabled = true;
-		//SettingsPanel.enabled = true;
-		//GetComponent<Canvas> ().enabled = false;
+
+		ConditionCanvasGroup.alpha = 0;
+		ConditionCanvasGroup.blocksRaycasts = false;
+
 		SettingsCanvasGroup.alpha = 1;
 		SettingsCanvasGroup.blocksRaycasts = true;
 	}
 
 	public void SaveSettings(){
-		//GameObject.Find("Settings Canvas").GetComponent<Canvas>().enabled = true;
-		//SettingsPanel.enabled = false;
-		//GetComponent<Canvas> ().enabled = false
+
 		SettingsCanvasGroup.alpha = 0;
 		SettingsCanvasGroup.blocksRaycasts = false;
+
+		ConditionCanvasGroup.alpha = 1;
+		ConditionCanvasGroup.blocksRaycasts = true;
 	}
 
 
@@ -109,6 +137,7 @@ public class SceneManager : MonoBehaviour {
 
 		//return currentTime;
 		return (float)System.Math.Round((double)currentTime,2);
-	}		
+	}
+				
 
 }

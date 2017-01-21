@@ -9,6 +9,13 @@ public class PipPop_Controller : MonoBehaviour {
 	private GameObject sphereScript;
 	private float spawnHeight;
 	private float adjuster;
+	private float distanceBetweenPoints;
+	private float distanceProximity;
+
+	private GameObject Scriptholder;
+	private bool isProximityDependent;
+
+
 	AudioSource audio;
 
 	// SCENE MANAGEMENT
@@ -17,13 +24,13 @@ public class PipPop_Controller : MonoBehaviour {
 
 	// Material variables
 	[Range(0.5f,2.0f)]
-	public float blinkFrequency;
+	private float blinkFrequency;
 
 	public Material material1;
 	public Material material2;
 
-	public float min = 0.3f;
-	public float max = 10.0f;
+	public float min = 1.0f;
+	//public float max = 10.0f;
 
 	// Use this for initialization
 	void Start () {
@@ -42,6 +49,9 @@ public class PipPop_Controller : MonoBehaviour {
 		transform.LookAt(Vector3.zero); // orientation towards origo
 		transform.Rotate(0, 0, 90); // horizontally alligned
 
+		Scriptholder = GameObject.Find("Scriptholder");
+		isProximityDependent = Scriptholder.GetComponent<SceneManager>().isProximityDependent;
+		blinkFrequency = Scriptholder.GetComponent<SceneManager>().blinkFrequency;
 		//Debug.Log("PipPop-pin spawn location: "+spawnPoint);
 		StartCoroutine(flasher());
 		
@@ -50,7 +60,8 @@ public class PipPop_Controller : MonoBehaviour {
 	// Update is called once per frame
 	void FixedUpdate () {
 		//blinkFrequency = blinkFrequency/DistanceBetweenPoints();
-		Debug.Log(DistanceBetweenPoints());
+		//Debug.Log(DistanceBetweenPoints());
+		Debug.Log(DistanceProximity());
 	}
 
 	IEnumerator flasher(){
@@ -64,10 +75,10 @@ public class PipPop_Controller : MonoBehaviour {
 			while(true){
 			GetComponent<MeshRenderer>().material = material1;
 				//audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(DistanceProximity());
 			GetComponent<MeshRenderer>().material = material2;
 				//audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(DistanceProximity());
 		}
 			break;
 
@@ -77,10 +88,11 @@ public class PipPop_Controller : MonoBehaviour {
 			while(true){
 				GetComponent<MeshRenderer>().material = material1;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency*DistanceBetweenPoints()/4);
+				//yield return new WaitForSeconds((blinkFrequency*DistanceBetweenPoints())/(sphereRadius*2));
+				yield return new WaitForSeconds(DistanceProximity());
 				GetComponent<MeshRenderer>().material = material2;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency*DistanceBetweenPoints()/4);
+				yield return new WaitForSeconds(DistanceProximity());
 			}
 			break;
 		
@@ -90,10 +102,10 @@ public class PipPop_Controller : MonoBehaviour {
 			while(true){
 				GetComponent<MeshRenderer>().material = material1;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(DistanceProximity());
 				GetComponent<MeshRenderer>().material = material2;
 				audio.Play();
-				yield return new WaitForSeconds(blinkFrequency);
+				yield return new WaitForSeconds(DistanceProximity());
 			}
 			break;
 		}
@@ -111,12 +123,22 @@ public class PipPop_Controller : MonoBehaviour {
 		return spawnPoint;
 	}
 
-	float DistanceBetweenPoints(){
+
+	float DistanceProximity(){ // This function increases/decrease the sound/material change depending on proximity to target
+
 		Vector3 x = GameObject.FindGameObjectWithTag("Tracker").GetComponent<Transform>().position;
 		Vector3 y = this.transform.position;
 
-		return Mathf.Clamp(Vector3.Distance(x,y),min,max);
-
+		distanceBetweenPoints = Vector3.Distance(x,y);
+		distanceProximity = Mathf.Clamp((blinkFrequency*distanceBetweenPoints)/(sphereRadius*2),0.1f,sphereRadius*2);
+		//return Mathf.Clamp(Vector3.Distance(x,y),4,sphereRadius*2);
+		//(blinkFrequency*distanceBetweenPoints)/(sphereRadius*2);
+		//Debug.Log(distanceProximity);
+		if(isProximityDependent){
+			return distanceProximity;
+		} else {
+			return blinkFrequency;
+		}
 	}
 
 }
