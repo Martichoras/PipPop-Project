@@ -11,9 +11,12 @@ public class PipPop_Controller : MonoBehaviour {
 	private float adjuster;
 	private float distanceBetweenPoints;
 	private float distanceProximity;
+	private float volumeProximity;
+	private float volume;
 
 	private GameObject Scriptholder;
 	private bool isProximityDependent;
+	private int attenuationMode;
 
 
 	AudioSource audio;
@@ -34,11 +37,10 @@ public class PipPop_Controller : MonoBehaviour {
 
 	// Use this for initialization
 	void Start () {
-		//sceneManager = GameObject.Find("Scriptholder");
+		
 		currentScene = Application.loadedLevelName;
 		Debug.Log(currentScene);
 
-		//spawnPoint = GetRandomPointOnSphere();
 		while(spawnPoint == Vector3.zero || spawnPoint.y > (spawnHeight * sphereRadius)){ // keep finding spawnpoint lower than spawnHeight
 			spawnPoint = GetRandomPointOnSphere();										//
 		}
@@ -52,6 +54,8 @@ public class PipPop_Controller : MonoBehaviour {
 		Scriptholder = GameObject.Find("Scriptholder");
 		isProximityDependent = Scriptholder.GetComponent<SceneManager>().isProximityDependent;
 		blinkFrequency = Scriptholder.GetComponent<SceneManager>().blinkFrequency;
+
+		attenuationMode = (int)Scriptholder.GetComponent<SceneManager>().attenuationValue;
 		//Debug.Log("PipPop-pin spawn location: "+spawnPoint);
 		StartCoroutine(flasher());
 		
@@ -59,9 +63,10 @@ public class PipPop_Controller : MonoBehaviour {
 	
 	// Update is called once per frame
 	void FixedUpdate () {
+		//volume = 1/DistanceProximity();
 		//blinkFrequency = blinkFrequency/DistanceBetweenPoints();
 		//Debug.Log(DistanceBetweenPoints());
-		Debug.Log(DistanceProximity());
+		//Debug.Log(DistanceProximity());
 	}
 
 	IEnumerator flasher(){
@@ -88,10 +93,17 @@ public class PipPop_Controller : MonoBehaviour {
 			while(true){
 				GetComponent<MeshRenderer>().material = material1;
 				audio.Play();
+				audio.volume = VolumeProximity();
 				//yield return new WaitForSeconds((blinkFrequency*DistanceBetweenPoints())/(sphereRadius*2));
 				yield return new WaitForSeconds(DistanceProximity());
 				GetComponent<MeshRenderer>().material = material2;
 				audio.Play();
+				audio.volume = VolumeProximity();
+				Debug.Log("Volume: "+VolumeProximity());
+				Debug.Log("Proximity: "+DistanceProximity());
+				//Debug.Log(volume);
+				//Debug.Log(-1*DistanceProximity());
+
 				yield return new WaitForSeconds(DistanceProximity());
 			}
 			break;
@@ -130,7 +142,7 @@ public class PipPop_Controller : MonoBehaviour {
 		Vector3 y = this.transform.position;
 
 		distanceBetweenPoints = Vector3.Distance(x,y);
-		distanceProximity = Mathf.Clamp((blinkFrequency*distanceBetweenPoints)/(sphereRadius*2),0.1f,sphereRadius*2);
+		distanceProximity = Mathf.Clamp((blinkFrequency*distanceBetweenPoints)/(sphereRadius*2),0.15f,sphereRadius*2);
 		//return Mathf.Clamp(Vector3.Distance(x,y),4,sphereRadius*2);
 		//(blinkFrequency*distanceBetweenPoints)/(sphereRadius*2);
 		//Debug.Log(distanceProximity);
@@ -139,6 +151,38 @@ public class PipPop_Controller : MonoBehaviour {
 		} else {
 			return blinkFrequency;
 		}
+	}
+
+	float VolumeProximity(){ // This function increases/decrease the sound/material change depending on proximity to target
+
+		float min = 0.1f;
+		float max = sphereRadius*2;
+
+		float soundAttenuation;
+		float linearAttenuation;
+		float quadraticAttenuation;
+
+		Vector3 x = GameObject.FindGameObjectWithTag("Tracker").GetComponent<Transform>().position;
+		Vector3 y = this.transform.position;
+
+		distanceBetweenPoints = sphereRadius*2-Vector3.Distance(x,y);
+		//distanceBetweenPoints = 1/distanceBetweenPoints;
+
+		linearAttenuation = (distanceBetweenPoints/max); // Linear sound attenuation
+		quadraticAttenuation = Mathf.Pow(linearAttenuation,2); // Quadratic sound attenuation
+
+		if(isProximityDependent){ // return the proximity dependent audio computation with linear or quadratic attenuation
+			if(attenuationMode == 1){
+				return linearAttenuation;
+			} else if(attenuationMode == 2){
+				return quadraticAttenuation;
+			} else {
+				return 1; // return max audio / no attenuation
+			}
+		} else {
+			return 1; // else return max audio
+		}
+
 	}
 
 }

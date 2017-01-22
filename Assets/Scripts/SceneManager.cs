@@ -11,10 +11,14 @@ public class SceneManager : MonoBehaviour {
 	private bool isActive;
 	public float pinAmount;
 	public float blinkFrequency;
+	public float attenuationValue;
+
 	private Text pinAmountUpdate;
 	private Text freqAmountUpdate;
 	private Slider pinSlider;
 	private Slider freqSlider;
+	private Dropdown attenuationSelect;
+
 	private CanvasGroup SettingsCanvasGroup;
 	private CanvasGroup ConditionCanvasGroup;
 
@@ -35,21 +39,20 @@ public class SceneManager : MonoBehaviour {
 			freqSlider = GameObject.Find("FreqSlider").GetComponent<Slider>();
 			blinkFrequency = freqSlider.value;
 			freqAmountUpdate = GameObject.Find("FreqAmountUpdate").GetComponent<Text>();
+
+			attenuationSelect = GameObject.Find("AttenuationDropdown").GetComponent<Dropdown>();
+			attenuationValue = attenuationSelect.value;
 		}
 
 		// Access and disable Settings canvas
 		SettingsCanvasGroup = GameObject.Find("SettingsCanvasGroup").GetComponent<CanvasGroup>();
-		//SettingsPanel = GameObject.Find("Settings Canvas").GetComponent<Canvas>();
 		SettingsCanvasGroup.alpha = 0;
 		SettingsCanvasGroup.blocksRaycasts = false;
 
 		ConditionCanvasGroup = GameObject.Find("ConditionCanvasGroup").GetComponent<CanvasGroup>();
-		//SettingsPanel = GameObject.Find("Settings Canvas").GetComponent<Canvas>();
-		//ConditionCanvasGroup.alpha = 0;
-		//ConditionCanvasGroup.blocksRaycasts = false;
 
-		//pinAmount = pinAmount;
-		//blinkFrequency = blinkFrequency;
+
+
 
 	}
 
@@ -61,7 +64,12 @@ public class SceneManager : MonoBehaviour {
 
 			blinkFrequency = freqSlider.value;
 			blinkFrequency = (float)System.Math.Round((double)blinkFrequency,2);
+
+			attenuationValue = attenuationSelect.value;
+			//Debug.Log(attenuationValue);
 			freqAmountUpdate.text = blinkFrequency.ToString();
+
+
 		}
 
 		currentTime += Time.deltaTime;
